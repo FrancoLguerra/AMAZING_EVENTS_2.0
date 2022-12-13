@@ -1,7 +1,9 @@
+const url = 'https://github.com/Juan2803/AmazingEvents4.0/blob/main/events.json'
 const arrayCards = {
   fechaActual: "2022-01-01",
   eventos: [
     {
+      id:1,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Feriadecomidas7.jpg",
       name: "Collectivities Party",
@@ -15,6 +17,7 @@ const arrayCards = {
       price: 5,
     },
     {
+      id:2,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Feriadecomidas2.jpg",
       name: "Korean style",
@@ -28,6 +31,7 @@ const arrayCards = {
       price: 10,
     },
     {
+      id:3,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Salidaalmuseo5.jpg",
       name: "Jurassic Park",
@@ -41,6 +45,7 @@ const arrayCards = {
       price: 15,
     },
     {
+      id:4,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Salidaalmuseo1.jpg",
       name: "Parisian Museum",
@@ -54,6 +59,7 @@ const arrayCards = {
       price: 3500,
     },
     {
+      id:5,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Fiestadedisfraces2.jpg",
       name: "Comicon",
@@ -67,6 +73,7 @@ const arrayCards = {
       price: 54,
     },
     {
+      id:6,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Fiestadedisfraces1.jpg",
       name: "Halloween Night",
@@ -79,6 +86,7 @@ const arrayCards = {
       price: 12,
     },
     {
+      id:7,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Conciertodemusica1.jpg",
       name: "Metallica in concert",
@@ -91,6 +99,7 @@ const arrayCards = {
       price: 150,
     },
     {
+      id:8,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Conciertodemusica2.jpg",
       name: "Electronic Fest",
@@ -104,6 +113,7 @@ const arrayCards = {
       price: 250,
     },
     {
+      id:9,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Maraton3.jpg",
       name: "10K for life",
       date: "2021-03-01",
@@ -115,6 +125,7 @@ const arrayCards = {
       price: 3,
     },
     {
+      id:10,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Maraton1.jpg",
       name: "15K NY",
       date: "2021-03-01",
@@ -127,6 +138,7 @@ const arrayCards = {
       price: 3,
     },
     {
+      id:11,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Libros7.jpg",
       name: "School's book fair",
       date: "2022-10-15",
@@ -138,6 +150,7 @@ const arrayCards = {
       price: 1,
     },
     {
+      id:12,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Libros3.jpg",
       name: "Just for your kitchen",
       date: "2021-11-09",
@@ -150,6 +163,7 @@ const arrayCards = {
       price: 100,
     },
     {
+      id:13,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Cine3.jpg",
       name: "Batman",
       date: "2021-3-11",
@@ -161,6 +175,7 @@ const arrayCards = {
       price: 225,
     },
     {
+      id:14,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Cine7.jpg",
       name: "Avengers",
       date: "2022-10-15",
@@ -193,20 +208,16 @@ const tomarCheckbox = () => {
           let cardAComparar = document.getElementById(j);
           if (e.target.value == arrayCards.eventos[j].category) {
             cardAComparar.classList.remove("hidden");
-
-            
           }
         }
       }
-      //pintarDom(eventos);
+      
     });
   }
 };
 
-
 const category = (arrayCards) => {
   let opciones = document.getElementById("container-opc");
-  console.log(opciones.innerHTML);
   let opcionesSinRepetidos = [];
   for (let i = 0; i < arrayCards.eventos.length; i++) {
     if (!opcionesSinRepetidos.includes(arrayCards.eventos[i].category)) {
@@ -231,42 +242,68 @@ const category = (arrayCards) => {
   // console.log("Saliendo",opciones.innerHTML)
   tomarCheckbox();
 };
-category(arrayCards);
+//category(arrayCards);
 
+// const pintarDom = (arrayCards) => {
+//   let cards = document.getElementById("cards");
 
+//   cards.innerHTML = "";
+//   if (window.location.pathname == "/pages/upcoming-events.html") {
+//     let eventos = [];
+//     for (let i = 0; i < arrayCards.length; i++) {
+//       if (fechaActual < Date.parse(arrayCards[i].date)) {
+//         eventos.push(arrayCards[i]);
+//       }
+//     }
+//     crearCards(eventos);
+//   } else if (window.location.pathname == "/index.html") {
+//     console.log(arrayCards);
+//     crearCards(arrayCards);
+//   } else if (window.location.pathname == "/pages/past-events.html") {
+//     let eventos = [];
+//     for (let i = 0; i < arrayCards.length; i++) {
+//       if (fechaActual > Date.parse(arrayCards[i].date)) {
+//         eventos.push(arrayCards[i]);
+//       }
+//     }
+//     crearCards(eventos);
+//   }
+// };
 
+const eventoDetalles = (arrayEventos) => {
+  console.log("dentro de eventoDetalles");
+  console.log(arrayEventos);
+  arrayEventos.forEach((evento) => {
+    document.querySelectorAll(".detalles").forEach((boton) => {
+      boton.addEventListener("click", (e) => {
+        
+        const eventoDetallado = {
+          id: evento.id,
+          image: evento.image,
+          name: evento.name,
+          date: evento.date,
+          description: evento.description,
+          category: evento.category,
+          place: evento.place,
+        };
 
-
-const pintarDom = (arrayCards) => {
-  let cards = document.getElementById("cards");
-
-  cards.innerHTML = "";
-  if (window.location.pathname == "/pages/upcoming-events.html") {
-    let eventos = [];
-    for (let i = 0; i < arrayCards.length; i++) {
-      if (fechaActual < Date.parse(arrayCards[i].date)) {
-        eventos.push(arrayCards[i]);
-      }
-    }
-    crearCards(eventos);
-  } else if (window.location.pathname == "/index.html") {
-    crearCards(arrayCards);
-  } else if (window.location.pathname == "/pages/past-events.html") {
-    let eventos = [];
-    for (let i = 0; i < arrayCards.length; i++) {
-      if (fechaActual > Date.parse(arrayCards[i].date)) {
-        eventos.push(arrayCards[i]);
-      }
-    }
-    crearCards(eventos);
-  }
+        localStorage.setItem(
+          "eventoDetallado",
+          JSON.stringify(eventoDetallado)
+        );
+      });
+    });
+  });
 };
+
 const crearCards = (arrayCards) => {
+  console.log("dentro de crearCards")
   let count = 0;
+
   arrayCards.forEach((evento) => {
     let cards = document.getElementById("cards");
     cards.innerHTML += `
-  <div class="card  col-xs-12 col-sm-4 col-md-5 col-lg-3 " style="width: 15rem;" id="${count}">
+  <div class="card  col-xs-12 col-sm-4 col-md-5 col-lg-3  " style="width: 15rem;" >
             <img src="${evento.image}" alt="..." />
             <div class="card-body">
               <h5 class="card-title">${evento.name}</h5>
@@ -274,16 +311,18 @@ const crearCards = (arrayCards) => {
               ${evento.description}
              
               </p>
-              <a href="./pages/description.html" class="btn btn-primary">Ver mas</a>
+              <a href="${href}" id="${evento.id}" class="btn btn-primary detalles">Ver mas</a>
             </div>
           </div>`;
-          count++;
+    count++;
   });
+
+  eventoDetalles(arrayCards);
 };
 
-const buscarInput = document.getElementById("buscarInput");
-const buscarBtn = document.getElementById("buscarBtn");
-const checkboxs = document.querySelectorAll(".form-check-input");
+// const buscarInput = document.getElementById("buscarInput");
+// const buscarBtn = document.getElementById("buscarBtn");
+// const checkboxs = document.querySelectorAll(".form-check-input");
 
 const buscarXInput = () => {
   let palabraClave = buscarInput.value;
@@ -300,47 +339,145 @@ const buscarXInput = () => {
   //pintarDom(arrayFiltrado);
 };
 
-buscarBtn.addEventListener("click", () => {
-  console.log("se hizo clic en btn buscar");
-  let arrayFiltradoXPalabra = [];
-  let categoriasSeleccionadas = [];
-  let arrayFiltradoXCheckbox = [];
-  console.log("se crearon arrays vacios");
-  checkboxs.forEach((checkbox) => {
-    console.log("entra al forEach");
-    if (checkbox.checked === true) {
-      categoriasSeleccionadas.push(checkbox.value);
-    }
-  });
+// buscarBtn.addEventListener("click", () => {
+//   console.log("se hizo clic en btn buscar");
+//   let arrayFiltradoXPalabra = [];
+//   let categoriasSeleccionadas = [];
+//   let arrayFiltradoXCheckbox = [];
+//   console.log("se crearon arrays vacios");
+//   checkboxs.forEach((checkbox) => {
+//     console.log("entra al forEach");
+//     if (checkbox.checked === true) {
+//       categoriasSeleccionadas.push(checkbox.value);
+//     }
+//   });
 
-  console.log("entra al if checked = true", categoriasSeleccionadas);
-  if (categoriasSeleccionadas.length > 0) {
-    arrayFiltradoXPalabra = buscarXInput();
+//   console.log("entra al if checked = true", categoriasSeleccionadas);
+//   if (categoriasSeleccionadas.length > 0) {
+//     arrayFiltradoXPalabra = buscarXInput();
 
-    console.log(arrayFiltradoXPalabra);
-    if (arrayFiltradoXPalabra.length > 0) {
-      categoriasSeleccionadas.forEach((categoria) => {
-        arrayFiltradoXCheckbox = arrayFiltradoXPalabra.filter((evento) => {
-          return evento.category.includes(categoria);
-        });
-      });
-    } else if (arrayFiltradoXPalabra.length <= 0) {
-      console.log("entra al else arrayFiltradoXPalabra.length > 0");
-      categoriasSeleccionadas.forEach((categoria) => {
-        arrayFiltradoXCheckbox = arrayCards.eventos.filter((evento) => {
-          return evento.category.includes(categoria);
-        });
-      });
-      console.log(arrayFiltradoXCheckbox);
-    }
-  } else if (categoriasSeleccionadas.length >0) {
-    arrayFiltradoXPalabra = buscarXInput();
-    if (arrayFiltradoXPalabra) {
-      arrayFiltradoXCheckbox = arrayFiltradoXPalabra;
+//     console.log(arrayFiltradoXPalabra);
+//     if (arrayFiltradoXPalabra.length > 0) {
+//       categoriasSeleccionadas.forEach((categoria) => {
+//         arrayFiltradoXCheckbox = arrayFiltradoXPalabra.filter((evento) => {
+//           return evento.category.includes(categoria);
+//         });
+//       });
+//     } else if (arrayFiltradoXPalabra.length <= 0) {
+//       console.log("entra al else arrayFiltradoXPalabra.length > 0");
+//       categoriasSeleccionadas.forEach((categoria) => {
+//         arrayFiltradoXCheckbox = arrayCards.eventos.filter((evento) => {
+//           return evento.category.includes(categoria);
+//         });
+//       });
+//       console.log(arrayFiltradoXCheckbox);
+//     }
+//   } else if (categoriasSeleccionadas.length > 0) {
+//     arrayFiltradoXPalabra = buscarXInput();
+//     if (arrayFiltradoXPalabra) {
+//       arrayFiltradoXCheckbox = arrayFiltradoXPalabra;
+//     }
+//   }
+//   console.log("antes de pintar el DOM", arrayFiltradoXCheckbox);
+//   pintarDom(arrayFiltradoXCheckbox);
+// });
+
+let href = "";
+//selecciono la acción a realizar según la url actual
+let router = () => {
+ 
+  const urlActual = window.location.pathname.split("/").pop();
+  switch (urlActual) {
+    
+    case "index.html":
+      routController(urlActual, "all");
+      break;
+    case "past-events.html":
+      routController(urlActual, "past");
+      break;
+    case "description.html":
+      //envio id del evento a la función que crea el modal
+      console.log("entra a description.html");
+      console.log(urlActual);
+      cardDescription();
+      break;
+    case "upcoming-events.html":
+      routController(urlActual, "upcoming");
+      break;
+    case "contact.html":
+      break;
+  }
+};
+//filtro eventos según la url actual
+const filteredEvents = (orden) => {
+  let arrayFiltrado = [];
+  if (orden === "past") {
+    for (let i = 0; i < arrayCards.eventos.length; i++) {
+      if (fechaActual > Date.parse(arrayCards.eventos[i].date)) {
+        arrayFiltrado.push(arrayCards.eventos[i]);
+      }
     }
   }
-  console.log("antes de pintar el DOM", arrayFiltradoXCheckbox);
-  pintarDom(arrayFiltradoXCheckbox);
-});
+  else if(orden === "upcoming"){
+    for (let i = 0; i < arrayCards.eventos.length; i++) {
+      if (fechaActual < Date.parse(arrayCards.eventos[i].date)) {
+        arrayFiltrado.push(arrayCards.eventos[i]);
+      }
+    }
+  }
+  else{
+    arrayFiltrado = arrayCards;
+  }
+  return arrayFiltrado;
+};
 
-pintarDom(arrayCards.eventos);
+//creo controlador de rutas
+const routController = (url, orden) => {
+  if (url === "past-events.html" || url === "upcoming-events.html") {
+    href = "./description.html";
+    let orderedEvents = filteredEvents(orden);
+    crearCards(orderedEvents);
+  }
+  else if(url === "index.html"){
+    href = "./pages/description.html";
+    crearCards(arrayCards.eventos);
+  }
+};
+
+const cardDescription = () => {
+  console.log("dentro de cardDescription");
+  let eventoLocalStorage = localStorage.getItem('eventoDetallado');
+  evento = JSON.parse(eventoLocalStorage);
+  console.log(evento);
+  mostrarCardDescription(evento);
+
+}
+const mostrarCardDescription = (evento) => {
+  console.log("dentro de mostrarCardDescription");
+  let containerDescription = document.getElementById("containerDescription");
+  containerDescription.innerHTML += `
+  <div class="card mb-3 w-100">
+  <div class="row g-0">
+    <div class="col-md-4">
+      <img
+        src=${evento.image}
+        class="img-fluid rounded-start"
+        alt="..."
+      />
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title">${evento.name}</h5>
+        <p class="card-text">
+        ${evento.description}
+        </p>
+        <p class="card-text">
+          <small class="text-muted">${evento.category}-${evento.date}</small>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+}
+  router();
