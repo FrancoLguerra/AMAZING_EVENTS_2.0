@@ -1,9 +1,10 @@
-const url = 'https://github.com/Juan2803/AmazingEvents4.0/blob/main/events.json'
+const url =
+  "https://github.com/Juan2805/AmazingEvents4.0/blob/main/events.json";
 const arrayCards = {
   fechaActual: "2022-01-01",
   eventos: [
     {
-      id:1,
+      id: 1,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Feriadecomidas7.jpg",
       name: "Collectivities Party",
@@ -17,7 +18,7 @@ const arrayCards = {
       price: 5,
     },
     {
-      id:2,
+      id: 2,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Feriadecomidas2.jpg",
       name: "Korean style",
@@ -31,7 +32,7 @@ const arrayCards = {
       price: 10,
     },
     {
-      id:3,
+      id: 3,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Salidaalmuseo5.jpg",
       name: "Jurassic Park",
@@ -45,7 +46,7 @@ const arrayCards = {
       price: 15,
     },
     {
-      id:4,
+      id: 4,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Salidaalmuseo1.jpg",
       name: "Parisian Museum",
@@ -59,7 +60,7 @@ const arrayCards = {
       price: 3500,
     },
     {
-      id:5,
+      id: 5,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Fiestadedisfraces2.jpg",
       name: "Comicon",
@@ -73,7 +74,7 @@ const arrayCards = {
       price: 54,
     },
     {
-      id:6,
+      id: 6,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Fiestadedisfraces1.jpg",
       name: "Halloween Night",
@@ -86,7 +87,7 @@ const arrayCards = {
       price: 12,
     },
     {
-      id:7,
+      id: 7,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Conciertodemusica1.jpg",
       name: "Metallica in concert",
@@ -99,7 +100,7 @@ const arrayCards = {
       price: 150,
     },
     {
-      id:8,
+      id: 8,
       image:
         "https://amazingeventsapi.herokuapp.com/api/img/Conciertodemusica2.jpg",
       name: "Electronic Fest",
@@ -113,7 +114,7 @@ const arrayCards = {
       price: 250,
     },
     {
-      id:9,
+      id: 9,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Maraton3.jpg",
       name: "10K for life",
       date: "2021-03-01",
@@ -125,7 +126,7 @@ const arrayCards = {
       price: 3,
     },
     {
-      id:10,
+      id: 10,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Maraton1.jpg",
       name: "15K NY",
       date: "2021-03-01",
@@ -138,7 +139,7 @@ const arrayCards = {
       price: 3,
     },
     {
-      id:11,
+      id: 11,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Libros7.jpg",
       name: "School's book fair",
       date: "2022-10-15",
@@ -150,7 +151,7 @@ const arrayCards = {
       price: 1,
     },
     {
-      id:12,
+      id: 12,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Libros3.jpg",
       name: "Just for your kitchen",
       date: "2021-11-09",
@@ -163,7 +164,7 @@ const arrayCards = {
       price: 100,
     },
     {
-      id:13,
+      id: 13,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Cine3.jpg",
       name: "Batman",
       date: "2021-3-11",
@@ -175,7 +176,7 @@ const arrayCards = {
       price: 225,
     },
     {
-      id:14,
+      id: 14,
       image: "https://amazingeventsapi.herokuapp.com/api/img/Cine7.jpg",
       name: "Avengers",
       date: "2022-10-15",
@@ -211,7 +212,6 @@ const tomarCheckbox = () => {
           }
         }
       }
-      
     });
   }
 };
@@ -275,8 +275,8 @@ const eventoDetalles = (arrayEventos) => {
   console.log(arrayEventos);
   arrayEventos.forEach((evento) => {
     document.querySelectorAll(".detalles").forEach((boton) => {
+      console.log(boton);
       boton.addEventListener("click", (e) => {
-        
         const eventoDetallado = {
           id: evento.id,
           image: evento.image,
@@ -297,7 +297,7 @@ const eventoDetalles = (arrayEventos) => {
 };
 
 const crearCards = (arrayCards) => {
-  console.log("dentro de crearCards")
+  console.log("dentro de crearCards");
   let count = 0;
 
   arrayCards.forEach((evento) => {
@@ -385,10 +385,8 @@ const buscarXInput = () => {
 let href = "";
 //selecciono la acción a realizar según la url actual
 let router = () => {
- 
   const urlActual = window.location.pathname.split("/").pop();
   switch (urlActual) {
-    
     case "index.html":
       routController(urlActual, "all");
       break;
@@ -406,6 +404,12 @@ let router = () => {
       break;
     case "contact.html":
       break;
+    case "stats.html":
+      showStatsEvents();
+      break;
+    default:
+      routController(urlActual, "all");
+      break;
   }
 };
 //filtro eventos según la url actual
@@ -417,15 +421,13 @@ const filteredEvents = (orden) => {
         arrayFiltrado.push(arrayCards.eventos[i]);
       }
     }
-  }
-  else if(orden === "upcoming"){
+  } else if (orden === "upcoming") {
     for (let i = 0; i < arrayCards.eventos.length; i++) {
       if (fechaActual < Date.parse(arrayCards.eventos[i].date)) {
         arrayFiltrado.push(arrayCards.eventos[i]);
       }
     }
-  }
-  else{
+  } else {
     arrayFiltrado = arrayCards;
   }
   return arrayFiltrado;
@@ -437,8 +439,7 @@ const routController = (url, orden) => {
     href = "./description.html";
     let orderedEvents = filteredEvents(orden);
     crearCards(orderedEvents);
-  }
-  else if(url === "index.html"){
+  } else if (url === "index.html") {
     href = "./pages/description.html";
     crearCards(arrayCards.eventos);
   }
@@ -446,12 +447,11 @@ const routController = (url, orden) => {
 
 const cardDescription = () => {
   console.log("dentro de cardDescription");
-  let eventoLocalStorage = localStorage.getItem('eventoDetallado');
+  let eventoLocalStorage = localStorage.getItem("eventoDetallado");
   evento = JSON.parse(eventoLocalStorage);
   console.log(evento);
   mostrarCardDescription(evento);
-
-}
+};
 const mostrarCardDescription = (evento) => {
   console.log("dentro de mostrarCardDescription");
   let containerDescription = document.getElementById("containerDescription");
@@ -478,6 +478,89 @@ const mostrarCardDescription = (evento) => {
     </div>
   </div>
 </div>`;
+};
+
+const showStatsEvents = async () => {
+  const events = await getPorcentageAttendance();
+  const groupByCategory = groupByCategory(events);
+  const eventsByCategory = eventsByCategory(groupByCategory);
+  const statsByCategory = getStatsByCategory(eventsByCategory); 
+  const orderedEvents = await orderedEvents(statsByCategory, "porcentageAttendance", "asc");
 
 }
-  router();
+
+const getAllEvents = async () => {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+};
+
+const getPorcentageAttendance = async () => {
+  //let events = await getAllEvents();
+  let events = arrayCards.eventos;
+  events.forEach((event) => {
+    let porcentageAttendance =
+      (event.capacity / (event.assistance || event.estimate)) * 100;
+    event.porcentageAttendance = porcentageAttendance;
+  });
+  return events;
+};
+
+const orderedEvents = async (events, attribute, order) => {
+  events.sort((a, b) => {
+    if (order === "asc") {
+      return b[attribute] - a[attribute];
+    } else {
+      return a[attribute] - b[attribute];
+    }
+  });
+  return events;
+};
+
+const groupByCategory = async (events) => {
+  let categories = [];
+  events.forEach((event) => {
+    if (!categories.includes(event.category)) {
+      categories.push(event.category);
+    }
+  });
+  return categories;
+};
+
+const eventsByCategory = async (categories) => {
+  let eventsByCategory = [];
+  categories.forEach((category) => {
+    let eventsByCategoryAux = events.filter(
+      (event) => event.category === category
+    );
+    eventsByCategory.push(eventsByCategoryAux);
+  });
+  console.log(eventsByCategory)
+  return eventsByCategory;
+};
+
+const getStatsByCategory = async (eventsByCategory) => {
+  let statsByCategory = [];
+  eventsByCategory.forEach((events) => {
+    let statsByCategoryAux = {
+      category: events[0].category,
+      totalEvents: events.length,
+      totalAssistance: 0,
+      totalCapacity: 0,
+      totalEstimate: 0,
+      totalPorcentageAttendance: 0,
+    };
+    events.forEach((event) => {
+      statsByCategoryAux.totalAssistance += event.assistance;
+      statsByCategoryAux.totalCapacity += event.capacity;
+      statsByCategoryAux.totalEstimate += event.estimate;
+      statsByCategoryAux.totalPorcentageAttendance +=
+        event.porcentageAttendance;
+    });
+    statsByCategory.push(statsByCategoryAux);
+  });
+
+  return statsByCategory;};
+
+router();
+eventsByCategory();
