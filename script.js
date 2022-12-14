@@ -155,7 +155,7 @@ const arrayCards = {
       image: "https://amazingeventsapi.herokuapp.com/api/img/Libros3.jpg",
       name: "Just for your kitchen",
       date: "2021-11-09",
-      escription:
+      description:
         "If you're a gastronomy lover come get the cookbook that best suits your taste and your family's.",
       category: "Book Exchange",
       place: "Room D6",
@@ -219,9 +219,9 @@ const tomarCheckbox = () => {
 const category = (arrayCards) => {
   let opciones = document.getElementById("container-opc");
   let opcionesSinRepetidos = [];
-  for (let i = 0; i < arrayCards.eventos.length; i++) {
-    if (!opcionesSinRepetidos.includes(arrayCards.eventos[i].category)) {
-      opcionesSinRepetidos.push(arrayCards.eventos[i].category);
+  for (let i = 0; i < arrayCards.length; i++) {
+    if (!opcionesSinRepetidos.includes(arrayCards[i].category)) {
+      opcionesSinRepetidos.push(arrayCards[i].category);
     }
   }
   for (let i = 0; i < opcionesSinRepetidos.length; i++) {
@@ -271,13 +271,13 @@ const category = (arrayCards) => {
 // };
 
 const eventoDetalles = (arrayEventos) => {
-  console.log("dentro de eventoDetalles");
-  console.log(arrayEventos);
+  localStorage.clear();
+
   arrayEventos.forEach((evento) => {
     document.querySelectorAll(".detalles").forEach((boton) => {
-      console.log(boton);
       boton.addEventListener("click", (e) => {
         const eventoDetallado = {
+          franco: "franco",
           id: evento.id,
           image: evento.image,
           name: evento.name,
@@ -291,13 +291,13 @@ const eventoDetalles = (arrayEventos) => {
           "eventoDetallado",
           JSON.stringify(eventoDetallado)
         );
+        localStorage.setItem("id", boton.id);
       });
     });
   });
 };
 
 const crearCards = (arrayCards) => {
-  console.log("dentro de crearCards");
   let count = 0;
 
   arrayCards.forEach((evento) => {
@@ -311,7 +311,7 @@ const crearCards = (arrayCards) => {
               ${evento.description}
              
               </p>
-              <a href="${href}" id="#${evento.id}" class="btn btn-primary detalles">Ver mas</a>
+              <a href="${href}" id="${evento.id}" class="btn btn-primary detalles">Ver mas</a>
             </div>
           </div>`;
     count++;
@@ -324,20 +324,20 @@ const crearCards = (arrayCards) => {
 // const buscarBtn = document.getElementById("buscarBtn");
 // const checkboxs = document.querySelectorAll(".form-check-input");
 
-const buscarXInput = () => {
-  let palabraClave = buscarInput.value;
-  let arrayFiltrado = [];
-  if (palabraClave.length > 0) {
-    arrayFiltrado = arrayCards.eventos.filter((evento) => {
-      return evento.name.toLowerCase().includes(palabraClave.toLowerCase());
-    });
-  }
-  return arrayFiltrado;
-  console.log(arrayFiltrado);
-  //let cards = document.getElementById("cards");
-  // cards.innerHTML = ``;
-  //pintarDom(arrayFiltrado);
-};
+// const buscarXInput = () => {
+//   let palabraClave = buscarInput.value;
+//   let arrayFiltrado = [];
+//   if (palabraClave.length > 0) {
+//     arrayFiltrado = arrayCards.eventos.filter((evento) => {
+//       return evento.name.toLowerCase().includes(palabraClave.toLowerCase());
+//     });
+//   }
+//   return arrayFiltrado;
+//   console.log(arrayFiltrado);
+//   //let cards = document.getElementById("cards");
+//   // cards.innerHTML = ``;
+//   //pintarDom(arrayFiltrado);
+// };
 
 // buscarBtn.addEventListener("click", () => {
 //   console.log("se hizo clic en btn buscar");
@@ -379,7 +379,7 @@ const buscarXInput = () => {
 //     }
 //   }
 //   console.log("antes de pintar el DOM", arrayFiltradoXCheckbox);
-//   pintarDom(arrayFiltradoXCheckbox);
+//   crearCards(arrayFiltradoXCheckbox);
 // });
 
 let href = "";
@@ -389,14 +389,14 @@ let router = () => {
   switch (urlActual) {
     case "index.html":
       routController(urlActual, "all");
+
       break;
     case "past-events.html":
       routController(urlActual, "past");
       break;
     case "description.html":
       //envio id del evento a la función que crea el modal
-      console.log("entra a description.html");
-      console.log(urlActual);
+
       cardDescription();
       break;
     case "upcoming-events.html":
@@ -413,8 +413,9 @@ let router = () => {
   }
 };
 //filtro eventos según la url actual
-const filteredEvents = (orden,array) => {
+const filteredEvents = (orden, array) => {
   let arrayFiltrado = [];
+  console.log("orden:", orden, "array:", array);
   if (orden === "past") {
     for (let i = 0; i < array.length; i++) {
       if (fechaActual > Date.parse(array[i].date)) {
@@ -434,21 +435,29 @@ const filteredEvents = (orden,array) => {
 };
 
 //creo controlador de rutas
-const routController = (url, orden) => {
+const routController = async (url, orden) => {
+  let events = arrayCards.eventos; // await getAllEvents();
   if (url === "past-events.html" || url === "upcoming-events.html") {
     href = "./description.html";
-    let orderedEvents = filteredEvents(orden.arrayCards.eventos);
+    let orderedEvents = filteredEvents(orden, events);
+    category(orderedEvents);
+
     crearCards(orderedEvents);
   } else if (url === "index.html") {
     href = "./pages/description.html";
+    category(arrayCards.eventos);
     crearCards(arrayCards.eventos);
   }
 };
 
 const cardDescription = () => {
   console.log("dentro de cardDescription");
-  let eventoLocalStorage = localStorage.getItem("eventoDetallado");
-  evento = JSON.parse(eventoLocalStorage);
+  let idEvent = localStorage.getItem("id");
+  console.log(idEvent);
+  const evento = arrayCards.eventos.find((evento) => {
+    return evento.id == idEvent;
+  });
+
   console.log(evento);
   mostrarCardDescription(evento);
 };
@@ -484,15 +493,26 @@ const templateEventsStats = async (eventsWhitPercentageAttendance) => {
   //creo la tabla para cargar los eventos
   console.log("entra a templateEventsStats");
   let table = document.getElementById("bodyEventsStats");
-  let mayorAttendance = await  getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "desc");
-  let mayorCapacity = await getOrderedEvents(eventsWhitPercentageAttendance, "capacity", "desc");
-  let menorAttendance = await getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "asc");
+  let mayorAttendance = await getOrderedEvents(
+    eventsWhitPercentageAttendance,
+    "porcentageAttendance",
+    "desc"
+  );
+  let mayorCapacity = await getOrderedEvents(
+    eventsWhitPercentageAttendance,
+    "capacity",
+    "desc"
+  );
+  let menorAttendance = await getOrderedEvents(
+    eventsWhitPercentageAttendance,
+    "porcentageAttendance",
+    "asc"
+  );
 
   const size = mayorAttendance.length;
 
-  for(let i = 0; i < size; i++){
-    
- table.innerHTML += `
+  for (let i = 0; i < size; i++) {
+    table.innerHTML += `
           
             <tr>
               <td class="td-width">${mayorAttendance[i].porcentageAttendance}</td>
@@ -500,44 +520,47 @@ const templateEventsStats = async (eventsWhitPercentageAttendance) => {
               <td class="td-width">${mayorCapacity[i].capacity}</td>
             </tr>
      `;
-};}
+  }
+};
 
-const templatePastOrUpcomingEventsStats = async (statsByCategory,momento) => {
+const templatePastOrUpcomingEventsStats = async (statsByCategory, momento) => {
   //creo la tabla para cargar los eventos
-  console.log("entra a templatePastOrUpcomingEventsStats",statsByCategory);
+  console.log("entra a templatePastOrUpcomingEventsStats", statsByCategory);
   // let mayorAttendance = getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "desc");
   // let menorAttendance = getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "asc");
   // let mayorCapacity = getOrderedEvents(eventsWhitPercentageAttendance, "capacity", "desc");
 
-  if(momento === "past"){
+  if (momento === "past") {
+    console.log("entra a past");
     let tablePast = document.getElementById("bodyPastEventsStats");
-    let eventsPast = filteredEvents('past',statsByCategory);
-    for(let i = 0; i < eventsPast.length; i++){
-    tablePast.innerHTML += `
+    for (let i = 0; i < statsByCategory.length; i++) {
+      console.log("entra for past", statsByCategory[i]);
+      tablePast.innerHTML += `
     <tr>
-    <td class="td-width">${eventsPast[i].category}</td>
-    <td class="td-width">${eventsPast[i].totalAssistance}</td>
-    <td class="td-width">${eventsPast[i].totalPorcentageAttendance}</td>
-    </tr>
+    <td class="td-width">${statsByCategory[i].category}</td>
+    <td class="td-width">${statsByCategory[i].totalAssistance}</td>
+    <td class="td-width">${statsByCategory[i].totalPorcentageAttendance}</td>
+  </tr>
     `;
     }
-  }else if(momento === "upcoming"){
+  } else if (momento === "upcoming") {
+    console.log("entra a upcoming");
     let tableUpcoming = document.getElementById("bodyUpcomingEventsStats");
-    let eventsUpcoming = await filteredEvents('upcoming',statsByCategory);
-    for(let i = 0; i < eventsUpcoming.length; i++){
- tableUpcoming.innerHTML += `
-  <table>
-          
+    for (let i = 0; i < statsByCategory.length; i++) {
+      console.log("entra for upcoming", statsByCategory[i]);
+      tableUpcoming.innerHTML += `
+  
             <tr>
-              <td class="td-width">${eventsUpcoming[i].category}</td>
-              <td class="td-width">${eventsUpcoming[i].totalAssistance}</td>
-              <td class="td-width">${eventsUpcoming[i].totalPorcentageAttendance}</td>
+              <td class="td-width">${statsByCategory[i].category}</td>
+              <td class="td-width">${statsByCategory[i].totalAssistance}</td>
+              <td class="td-width">${statsByCategory[i].totalPorcentageAttendance}</td>
             </tr>
-     `;}
-;}
-else{
-  alert("error");
-}}
+     `;
+    }
+  } else {
+    alert("error");
+  }
+};
 
 const getAllEvents = async () => {
   const response = await fetch(url);
@@ -549,7 +572,7 @@ const getPorcentageAttendance = async (events) => {
   //let events = await getAllEvents();
   events.forEach((event) => {
     let porcentageAttendance =
-      (  (event.assistance || event.estimate)/ event.capacity) * 100;
+      ((event.assistance || event.estimate) / event.capacity) * 100;
     event.porcentageAttendance = porcentageAttendance;
   });
   return events;
@@ -576,15 +599,14 @@ const getGroupByCategory = (events) => {
   return categories;
 };
 
-const getEventsByCategory = (categories,events) => {
+const getEventsByCategory = (categories, events) => {
   let eventsByCategory = [];
   let size = categories.length;
   categories.forEach((category) => {
     let eventsByCategoryAux = events.filter(
-      (event) => event.category === category    
+      (event) => event.category === category
     );
-   
-    
+
     eventsByCategory.push(eventsByCategoryAux);
   });
 
@@ -592,6 +614,7 @@ const getEventsByCategory = (categories,events) => {
 };
 
 const getStatsByCategory = async (eventsByCategory) => {
+  console.log("entra a getStatsByCategory", eventsByCategory);
   let statsByCategory = [];
   eventsByCategory.forEach((events) => {
     let statsByCategoryAux = {
@@ -616,15 +639,33 @@ const getStatsByCategory = async (eventsByCategory) => {
 };
 
 const showStatsEvents = async () => {
-  const events = arrayCards.eventos; //await getPorcentageAttendance();
+  const events = arrayCards.eventos; //await getAllEvents();
   console.log(events);
   const eventsPorcentageAttendance = await getPorcentageAttendance(events);
-  const groupByCategory = getGroupByCategory(eventsPorcentageAttendance);
-  const eventsByCategory = getEventsByCategory(groupByCategory,events);
-  const statsByCategory = await getStatsByCategory(eventsByCategory);
+  const upcomingEvents = await filteredEvents(
+    "upcoming",
+    eventsPorcentageAttendance
+  );
+  const upcomingGroupByCategory = getGroupByCategory(upcomingEvents);
+  const upcomingEventsByCategory = getEventsByCategory(
+    upcomingGroupByCategory,
+    upcomingEvents
+  );
+  const upcomingStatsByCategory = await getStatsByCategory(
+    upcomingEventsByCategory
+  );
+  console.log(upcomingStatsByCategory);
+  const pastEvents = await filteredEvents("past", eventsPorcentageAttendance);
+  const pastGroupByCategory = getGroupByCategory(pastEvents);
+  const pastEventsByCategory = getEventsByCategory(
+    pastGroupByCategory,
+    pastEvents
+  );
+  const pastStatsByCategory = await getStatsByCategory(pastEventsByCategory);
+
   templateEventsStats(eventsPorcentageAttendance);
-  templatePastOrUpcomingEventsStats(statsByCategory,'upcoming');
-  templatePastOrUpcomingEventsStats(statsByCategory,'past');
+  templatePastOrUpcomingEventsStats(upcomingStatsByCategory, "upcoming");
+  templatePastOrUpcomingEventsStats(pastEventsByCategory, "past");
 };
 
 router();
