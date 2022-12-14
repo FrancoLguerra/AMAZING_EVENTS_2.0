@@ -311,7 +311,7 @@ const crearCards = (arrayCards) => {
               ${evento.description}
              
               </p>
-              <a href="${href}" id="${evento.id}" class="btn btn-primary detalles">Ver mas</a>
+              <a href="${href}" id="#${evento.id}" class="btn btn-primary detalles">Ver mas</a>
             </div>
           </div>`;
     count++;
@@ -413,22 +413,22 @@ let router = () => {
   }
 };
 //filtro eventos según la url actual
-const filteredEvents = (orden) => {
+const filteredEvents = (orden,array) => {
   let arrayFiltrado = [];
   if (orden === "past") {
-    for (let i = 0; i < arrayCards.eventos.length; i++) {
-      if (fechaActual > Date.parse(arrayCards.eventos[i].date)) {
-        arrayFiltrado.push(arrayCards.eventos[i]);
+    for (let i = 0; i < array.length; i++) {
+      if (fechaActual > Date.parse(array[i].date)) {
+        arrayFiltrado.push(array[i]);
       }
     }
   } else if (orden === "upcoming") {
-    for (let i = 0; i < arrayCards.eventos.length; i++) {
-      if (fechaActual < Date.parse(arrayCards.eventos[i].date)) {
-        arrayFiltrado.push(arrayCards.eventos[i]);
+    for (let i = 0; i < array.length; i++) {
+      if (fechaActual < Date.parse(array[i].date)) {
+        arrayFiltrado.push(array[i]);
       }
     }
   } else {
-    arrayFiltrado = arrayCards;
+    arrayFiltrado = array;
   }
   return arrayFiltrado;
 };
@@ -437,7 +437,7 @@ const filteredEvents = (orden) => {
 const routController = (url, orden) => {
   if (url === "past-events.html" || url === "upcoming-events.html") {
     href = "./description.html";
-    let orderedEvents = filteredEvents(orden);
+    let orderedEvents = filteredEvents(orden.arrayCards.eventos);
     crearCards(orderedEvents);
   } else if (url === "index.html") {
     href = "./pages/description.html";
@@ -480,14 +480,64 @@ const mostrarCardDescription = (evento) => {
 </div>`;
 };
 
-const showStatsEvents = async () => {
-  const events = await getPorcentageAttendance();
-  const groupByCategory = groupByCategory(events);
-  const eventsByCategory = eventsByCategory(groupByCategory);
-  const statsByCategory = getStatsByCategory(eventsByCategory); 
-  const orderedEvents = await orderedEvents(statsByCategory, "porcentageAttendance", "asc");
+const templateEventsStats = async (eventsWhitPercentageAttendance) => {
+  //creo la tabla para cargar los eventos
+  console.log("entra a templateEventsStats");
+  let table = document.getElementById("bodyEventsStats");
+  let mayorAttendance = await  getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "desc");
+  let mayorCapacity = await getOrderedEvents(eventsWhitPercentageAttendance, "capacity", "desc");
+  let menorAttendance = await getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "asc");
 
-}
+  const size = mayorAttendance.length;
+
+  for(let i = 0; i < size; i++){
+    
+ table.innerHTML += `
+          
+            <tr>
+              <td class="td-width">${mayorAttendance[i].porcentageAttendance}</td>
+              <td class="td-width">${menorAttendance[i].porcentageAttendance}</td>
+              <td class="td-width">${mayorCapacity[i].capacity}</td>
+            </tr>
+     `;
+};}
+
+const templatePastOrUpcomingEventsStats = async (statsByCategory,momento) => {
+  //creo la tabla para cargar los eventos
+  console.log("entra a templatePastOrUpcomingEventsStats",statsByCategory);
+  // let mayorAttendance = getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "desc");
+  // let menorAttendance = getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "asc");
+  // let mayorCapacity = getOrderedEvents(eventsWhitPercentageAttendance, "capacity", "desc");
+
+  if(momento === "past"){
+    let tablePast = document.getElementById("bodyPastEventsStats");
+    let eventsPast = filteredEvents('past',statsByCategory);
+    for(let i = 0; i < eventsPast.length; i++){
+    tablePast.innerHTML += `
+    <tr>
+    <td class="td-width">${eventsPast[i].category}</td>
+    <td class="td-width">${eventsPast[i].totalAssistance}</td>
+    <td class="td-width">${eventsPast[i].totalPorcentageAttendance}</td>
+    </tr>
+    `;
+    }
+  }else if(momento === "upcoming"){
+    let tableUpcoming = document.getElementById("bodyUpcomingEventsStats");
+    let eventsUpcoming = await filteredEvents('upcoming',statsByCategory);
+    for(let i = 0; i < eventsUpcoming.length; i++){
+ tableUpcoming.innerHTML += `
+  <table>
+          
+            <tr>
+              <td class="td-width">${eventsUpcoming[i].category}</td>
+              <td class="td-width">${eventsUpcoming[i].totalAssistance}</td>
+              <td class="td-width">${eventsUpcoming[i].totalPorcentageAttendance}</td>
+            </tr>
+     `;}
+;}
+else{
+  alert("error");
+}}
 
 const getAllEvents = async () => {
   const response = await fetch(url);
@@ -495,18 +545,17 @@ const getAllEvents = async () => {
   return data;
 };
 
-const getPorcentageAttendance = async () => {
+const getPorcentageAttendance = async (events) => {
   //let events = await getAllEvents();
-  let events = arrayCards.eventos;
   events.forEach((event) => {
     let porcentageAttendance =
-      (event.capacity / (event.assistance || event.estimate)) * 100;
+      (  (event.assistance || event.estimate)/ event.capacity) * 100;
     event.porcentageAttendance = porcentageAttendance;
   });
   return events;
 };
 
-const orderedEvents = async (events, attribute, order) => {
+const getOrderedEvents = async (events, attribute, order) => {
   events.sort((a, b) => {
     if (order === "asc") {
       return b[attribute] - a[attribute];
@@ -517,7 +566,7 @@ const orderedEvents = async (events, attribute, order) => {
   return events;
 };
 
-const groupByCategory = async (events) => {
+const getGroupByCategory = (events) => {
   let categories = [];
   events.forEach((event) => {
     if (!categories.includes(event.category)) {
@@ -527,15 +576,18 @@ const groupByCategory = async (events) => {
   return categories;
 };
 
-const eventsByCategory = async (categories) => {
+const getEventsByCategory = (categories,events) => {
   let eventsByCategory = [];
+  let size = categories.length;
   categories.forEach((category) => {
     let eventsByCategoryAux = events.filter(
-      (event) => event.category === category
+      (event) => event.category === category    
     );
+   
+    
     eventsByCategory.push(eventsByCategoryAux);
   });
-  console.log(eventsByCategory)
+
   return eventsByCategory;
 };
 
@@ -560,7 +612,20 @@ const getStatsByCategory = async (eventsByCategory) => {
     statsByCategory.push(statsByCategoryAux);
   });
 
-  return statsByCategory;};
+  return statsByCategory;
+};
+
+const showStatsEvents = async () => {
+  const events = arrayCards.eventos; //await getPorcentageAttendance();
+  console.log(events);
+  const eventsPorcentageAttendance = await getPorcentageAttendance(events);
+  const groupByCategory = getGroupByCategory(eventsPorcentageAttendance);
+  const eventsByCategory = getEventsByCategory(groupByCategory,events);
+  const statsByCategory = await getStatsByCategory(eventsByCategory);
+  templateEventsStats(eventsPorcentageAttendance);
+  templatePastOrUpcomingEventsStats(statsByCategory,'upcoming');
+  templatePastOrUpcomingEventsStats(statsByCategory,'past');
+};
 
 router();
-eventsByCategory();
+//eventsByCategory();
