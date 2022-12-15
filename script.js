@@ -501,7 +501,7 @@ const templateEventsStats = async (eventsWhitPercentageAttendance) => {
   let mayorCapacity = await getOrderedEvents(
     eventsWhitPercentageAttendance,
     "capacity",
-    "desc"
+    "asc"
   );
   let menorAttendance = await getOrderedEvents(
     eventsWhitPercentageAttendance,
@@ -509,6 +509,7 @@ const templateEventsStats = async (eventsWhitPercentageAttendance) => {
     "asc"
   );
 
+  let invert = mayorAttendance.length - 1;
   const size = mayorAttendance.length;
 
   for (let i = 0; i < size; i++) {
@@ -516,20 +517,22 @@ const templateEventsStats = async (eventsWhitPercentageAttendance) => {
           
             <tr>
               <td class="td-width">${mayorAttendance[i].porcentageAttendance}</td>
-              <td class="td-width">${menorAttendance[i].porcentageAttendance}</td>
+              <td class="td-width">${menorAttendance[invert].porcentageAttendance}</td>
               <td class="td-width">${mayorCapacity[i].capacity}</td>
             </tr>
      `;
+    invert--;
   }
 };
 
 const templatePastOrUpcomingEventsStats = async (statsByCategory, momento) => {
   //creo la tabla para cargar los eventos
-  console.log("entra a templatePastOrUpcomingEventsStats", statsByCategory);
+
   // let mayorAttendance = getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "desc");
   // let menorAttendance = getOrderedEvents(eventsWhitPercentageAttendance, "porcentageAttendance", "asc");
   // let mayorCapacity = getOrderedEvents(eventsWhitPercentageAttendance, "capacity", "desc");
-
+  const statsByCategoryOrderPorcentageAttendance = await getOrderedEvents(
+    statsByCategory, 'totalPorcentageAttendance', "asc" );
   if (momento === "past") {
     console.log("entra a past");
     let tablePast = document.getElementById("bodyPastEventsStats");
@@ -538,8 +541,8 @@ const templatePastOrUpcomingEventsStats = async (statsByCategory, momento) => {
       tablePast.innerHTML += `
     <tr>
     <td class="td-width">${statsByCategory[i].category}</td>
-    <td class="td-width">${statsByCategory[i].totalAssistance}</td>
-    <td class="td-width">${statsByCategory[i].totalPorcentageAttendance}</td>
+    <td class="td-width">${statsByCategory[i].totalAssistance || 0}</td>
+    <td class="td-width">${statsByCategoryOrderPorcentageAttendance[i].totalPorcentageAttendance}</td>
   </tr>
     `;
     }
@@ -549,18 +552,27 @@ const templatePastOrUpcomingEventsStats = async (statsByCategory, momento) => {
     for (let i = 0; i < statsByCategory.length; i++) {
       console.log("entra for upcoming", statsByCategory[i]);
       tableUpcoming.innerHTML += `
-  
-            <tr>
-              <td class="td-width">${statsByCategory[i].category}</td>
-              <td class="td-width">${statsByCategory[i].totalAssistance}</td>
-              <td class="td-width">${statsByCategory[i].totalPorcentageAttendance}</td>
-            </tr>
-     `;
+      <tr>
+    <td class="td-width">${statsByCategory[i].category}</td>
+    <td class="td-width">${statsByCategory[i].totalAssistance || 0}</td>
+    <td class="td-width">${statsByCategoryOrderPorcentageAttendance[i].totalPorcentageAttendance}</td>
+  </tr>
+    `;
     }
   } else {
     alert("error");
   }
 };
+
+// const templateRow = (event) => {
+//   const row = `
+//   <tr>
+//   <td class="td-width">${event.category}</td>
+//   <td class="td-width">${event[i].totalAssistance ||0}</td>
+//   <td class="td-width">${event[i].totalPorcentageAttendance}</td>
+// </tr>`
+//   return row;
+// }
 
 const getAllEvents = async () => {
   const response = await fetch(url);
@@ -582,7 +594,7 @@ const getOrderedEvents = async (events, attribute, order) => {
   events.sort((a, b) => {
     if (order === "asc") {
       return b[attribute] - a[attribute];
-    } else {
+    } else if (order === "desc") {
       return a[attribute] - b[attribute];
     }
   });
@@ -614,11 +626,10 @@ const getEventsByCategory = (categories, events) => {
 };
 
 const getStatsByCategory = async (eventsByCategory) => {
-  console.log("entra a getStatsByCategory", eventsByCategory);
   let statsByCategory = [];
   eventsByCategory.forEach((events) => {
     let statsByCategoryAux = {
-      category: events[0].category,
+      category: "",
       totalEvents: events.length,
       totalAssistance: 0,
       totalCapacity: 0,
@@ -626,6 +637,7 @@ const getStatsByCategory = async (eventsByCategory) => {
       totalPorcentageAttendance: 0,
     };
     events.forEach((event) => {
+      statsByCategoryAux.category = event.category;
       statsByCategoryAux.totalAssistance += event.assistance;
       statsByCategoryAux.totalCapacity += event.capacity;
       statsByCategoryAux.totalEstimate += event.estimate;
@@ -636,6 +648,27 @@ const getStatsByCategory = async (eventsByCategory) => {
   });
 
   return statsByCategory;
+};
+//sumo los valores totales por categoria
+const getStatsByCategoryTotal = async (statsByCategory) => {
+  let statsByCategoryTotal = {
+    totalEvents: 0,
+    totalAssistance: 0,
+    totalCapacity: 0,
+    totalEstimate: 0,
+    totalPorcentageAttendance: 0,
+  };
+  statsByCategory.forEach((stats) => {
+    console.log(stats);
+    statsByCategoryTotal.totalEvents += stats.totalEvents;
+    statsByCategoryTotal.totalAssistance += stats.totalAssistance;
+    statsByCategoryTotal.totalCapacity += stats.totalCapacity;
+    statsByCategoryTotal.totalEstimate += stats.totalEstimate;
+    statsByCategoryTotal.totalPorcentageAttendance +=
+      stats.totalPorcentageAttendance;
+  });
+  console.log(statsByCategoryTotal, "statsByCategoryTotal");
+  return statsByCategoryTotal;
 };
 
 const showStatsEvents = async () => {
@@ -652,7 +685,11 @@ const showStatsEvents = async () => {
     upcomingEvents
   );
   const upcomingStatsByCategory = await getStatsByCategory(
-    upcomingEventsByCategory
+    upcomingEventsByCategory,
+    "upcoming"
+  );
+  const upcomingStatsByCategoryTotal = await getStatsByCategoryTotal(
+    upcomingStatsByCategory
   );
   console.log(upcomingStatsByCategory);
   const pastEvents = await filteredEvents("past", eventsPorcentageAttendance);
@@ -661,11 +698,20 @@ const showStatsEvents = async () => {
     pastGroupByCategory,
     pastEvents
   );
-  const pastStatsByCategory = await getStatsByCategory(pastEventsByCategory);
+  const pastStatsByCategory = await getStatsByCategory(
+    pastEventsByCategory,
+    "past"
+  );
+  console.log(pastStatsByCategory);
+  const pastStatsByCategoryTotal = await getStatsByCategoryTotal(
+    pastStatsByCategory
+  );
 
   templateEventsStats(eventsPorcentageAttendance);
   templatePastOrUpcomingEventsStats(upcomingStatsByCategory, "upcoming");
-  templatePastOrUpcomingEventsStats(pastEventsByCategory, "past");
+  console.log(upcomingStatsByCategoryTotal, "upcoming total");
+  templatePastOrUpcomingEventsStats(pastStatsByCategory, "past");
+  //console.log(pastStatsByCategoryTotal, "past total")
 };
 
 router();
